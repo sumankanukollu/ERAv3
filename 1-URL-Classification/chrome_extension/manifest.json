@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "URL Classification using Encoder-Only Transformer",
+  "version": "1.0",
+  "description": "Classify URLs using deep learning",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "activeTab"
+  ]
+}
