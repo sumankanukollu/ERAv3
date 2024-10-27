@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Selector and File Uploader</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <h1>Animal Showcase & File Content Preview</h1>
+    <div class="container">
+        <div class="column">
+            <h2>Select an Animal</h2>
+            <select id="animalSelect">
+                <option value="">Choose an animal</option>
+                <option value="cat">Cat</option>
+                <option value="dog">Dog</option>
+                <option value="elephant">Elephant</option>
+            </select>
+            <div id="animalImageContainer">
+                <div id="animalImage"></div>
+            </div>
+        </div>
+        <div class="column">
+            <h2>Upload File</h2>
+            <input type="file" id="fileInput">
+            <div id="fileInfo"></div>
+        </div>
+    </div>
+    <script src="/static/js/script.js"></script>
+</body>
+</html>
