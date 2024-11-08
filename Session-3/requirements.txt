@@ -1,0 +1,14 @@
+trimesh
+Pillow
+numpy
+scipy
+nltk
+wordnet
+torchvision
+torch
+scipy
+scipy.io
+scipy.signal    
+matplotlib
+mpl_toolkits
+numpy

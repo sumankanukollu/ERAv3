@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Processing App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="home-button">
+            <a href="{{ url_for('upload_file') }}" class="btn-home">Home</a>
+        </div>
+        
+        <h1>File Processing Application</h1>
+        
+        <!-- Modified Upload Form with file type selection -->
+        <div class="upload-section">
+            <form method="post" enctype="multipart/form-data">
+                <div class="file-type-selection">
+                    <label for="file-type">Select File Type:</label>
+                    <select name="file-type" id="file-type" onchange="updateFileAccept()">
+                        <option value="image">Image File</option>
+                        <option value="text">Text File</option>
+                        <option value="audio">Audio File</option>
+                        <option value="3d">3D File</option>
+                    </select>
+                </div>
+                
+                <div class="processing-options">
+                    <!-- Text processing options -->
+                    <div id="text-options" class="type-options" style="display:none;">
+                        <label>Text Processing:</label>
+                        <select name="text-process">
+                            <option value="random_insertion">random_insertion</option>
+                            <option value="random_deletion">random_deletion</option>
+                            <option value="random_swap">random_swap</option>
+                            <option value="synonym_replacement">synonym_replacement</option>
+                        </select>
+                    </div>
+
+                    <!-- Image processing options -->
+                    <div id="image-options" class="type-options">
+                        <label>Image Processing:</label>
+                        <select name="image-process">
+                            <option value="grayscale">Grayscale</option>
+                            <option value="blur">Blur</option>
+                            <option value="edge">Edge Detection</option>
+                            <option value="sharpen">Sharpen</option>
+                        </select>    
+                    </div>    
+
+                    <!-- Audio processing options -->
+                    <div id="audio-options" class="type-options" style="display:none;">
+                        <label>Audio Processing:</label>
+                        <select name="audio-process">
+                            <option value="noise-reduction">Noise Reduction</option>
+                            <option value="amplify">Amplify</option>
+                            <option value="echo">Add Echo</option>
+                        </select>
+                    </div>
+
+                    <!-- 3D processing options -->
+                    <div id="3d-options" class="type-options" style="display:none;">
+                        <label>3D Processing:</label>
+                        <select name="3d-process">
+                            <option value="simplify">Simplify Mesh</option>
+                            <option value="smooth">Smooth Surface</option>
+                            <option value="scale">Scale Model</option>
+                        </select>
+                    </div>
+                </div>
+
+                <input type="file" name="file" id="file-input">
+                <input type="submit" value="Upload and Process">
+            </form>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if original_file %}
+        <div class="display-section">
+            <!-- Original File -->
+            <div class="display-box">
+                <h2>Original File</h2>
+                {% if file_type == 'image' %}
+                    <img src="{{ original_file }}" alt="Original Image">
+                {% elif file_type == 'text' %}
+                    <iframe src="{{ original_file }}"></iframe>
+                {% elif file_type == 'audio' %}
+                    <audio controls>
+                        <source src="{{ original_file }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                {% elif file_type == '3d' %}
+                    <div class="model-viewer">
+                        <!-- Add 3D viewer implementation here -->
+                        <p>3D File: {{ original_file }}</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Processed File -->
+            <div class="display-box">
+                <h2>Processed File</h2>
+                {% if file_type == 'image' %}
+                    <img src="{{ processed_file }}" alt="Processed Image">
+                {% elif file_type == 'text' %}
+                    <iframe src="{{ processed_file }}"></iframe>
+                {% elif file_type == 'audio' %}
+                    <audio controls>
+                        <source src="{{ processed_file }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                {% elif file_type == '3d' %}
+                    <div class="model-viewer">
+                        <!-- Add 3D viewer implementation here -->
+                        <p>3D File: {{ processed_file }}</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Augmented File -->
+            <div class="display-box">
+                <h2>Augmented File</h2>
+                {% if file_type == 'image' %}
+                    <img src="{{ augmented_file }}" alt="Augmented Image">
+                {% elif file_type == 'text' %}
+                    <iframe src="{{ augmented_file }}"></iframe>
+                {% elif file_type == 'audio' %}
+                    <audio controls>
+                        <source src="{{ augmented_file }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                {% elif file_type == '3d' %}
+                    <div class="model-viewer">
+                        <!-- Add 3D viewer implementation here -->
+                        <p>3D File: {{ augmented_file }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function updateFileAccept() {
+            const fileType = document.getElementById('file-type').value;
+            const fileInput = document.getElementById('file-input');
+            const allOptions = document.getElementsByClassName('type-options');
+            
+            // Hide all processing options first
+            for(let options of allOptions) {
+                options.style.display = 'none';
+            }
+            
+            // Show relevant processing options and set file accept attribute
+            switch(fileType) {
+                case 'image':
+                    fileInput.accept = '.png,.jpg,.jpeg,.gif';
+                    document.getElementById('image-options').style.display = 'block';
+                    break;
+                case 'text':
+                    fileInput.accept = '.txt';
+                    document.getElementById('text-options').style.display = 'block';
+                    break;
+                case 'audio':
+                    fileInput.accept = '.wav,.mp3';
+                    document.getElementById('audio-options').style.display = 'block';
+                    break;
+                case '3d':
+                    fileInput.accept = '.obj,.stl,.off';
+                    document.getElementById('3d-options').style.display = 'block';
+                    break;
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', updateFileAccept);
+    </script>
+</body>
+</html> 
