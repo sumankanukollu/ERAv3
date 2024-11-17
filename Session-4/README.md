@@ -1,4 +1,4 @@
-# MNIST Neural Network Visualization
+# CNN vs FFNN: MNIST Model Comparison Made Simple Application
 
 This project implements a 4-layer neural network for MNIST digit classification with real-time training visualization.
 
