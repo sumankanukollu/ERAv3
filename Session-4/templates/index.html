@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Understanding MNIST Model Comparison Application</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .model-configs {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .model-config {
+            flex: 1;
+            padding: 20px;
+            background-color: #f8f8f8;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+        .config-section {
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        .comparison-table th {
+            background-color: #f4f4f4;
+        }
+        .plots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .plot {
+            flex: 1;
+            min-width: 600px;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .status.idle {
+            background-color: #f0f0f0;
+            color: #666;
+        }
+        .status.training {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status.completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .model-summary {
+            font-family: monospace;
+            white-space: pre;
+            background-color: #f8f8f8;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            overflow-x: auto;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .summary-section {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CNN vs FFNN: MNIST Model Comparison Made Simple Application</h1>
+        
+        <div class="model-configs">
+            <!-- Model 1 Configuration -->
+            <div class="model-config">
+                <h2>Model-1 Configuration</h2>
+                <div class="config-section">
+                    <h3>Model Type:</h3>
+                    <select id="m1-model-type" onchange="toggleChannelInputs(1)">
+                        <option value="fnn">Feed Forward Neural Network</option>
+                        <option value="cnn">Convolutional Neural Network</option>
+                    </select>
+                </div>
+                
+                <div class="config-section" id="m1-fnn-config" style="display: none;">
+                    <h3>Hidden Neurons (FFNN only)</h3>
+                    <div class="form-group">
+                        <label>Layer 1:</label>
+                        <input type="number" id="m1-neuron1" value="512" min="32" max="1024" step="32">
+                    </div>
+                    <div class="form-group">
+                        <label>Layer 2:</label>
+                        <input type="number" id="m1-neuron2" value="256" min="32" max="512" step="32">
+                    </div>
+                    <div class="form-group">
+                        <label>Layer 3:</label>
+                        <input type="number" id="m1-neuron3" value="128" min="32" max="256" step="32">
+                    </div>
+                </div>
+                
+                <div class="config-section" id="m1-cnn-config" style="display: none;">
+                    <h3>Channel Sizes (CNN only)</h3>
+                    <div class="form-group">
+                        <label>Conv Layer 1:</label>
+                        <input type="number" id="m1-channel1" value="16" min="8" max="64" step="8">
+                    </div>
+                    <div class="form-group">
+                        <label>Conv Layer 2:</label>
+                        <input type="number" id="m1-channel2" value="32" min="16" max="128" step="16">
+                    </div>
+                    <div class="form-group">
+                        <label>Conv Layer 3:</label>
+                        <input type="number" id="m1-channel3" value="64" min="32" max="256" step="32">
+                    </div>
+                </div>
+                
+                <div class="config-section">
+                    <h3>Training Parameters</h3>
+                    <div class="form-group">
+                        <label>Optimizer:</label>
+                        <select id="m1-optimizer">
+                            <option value="sgd">SGD</option>
+                            <option value="momentum">Momentum</option>
+                            <option value="nag">NAG</option>
+                            <option value="adam" selected>Adam</option>
+                            <option value="adagrad">AdaGrad</option>
+                            <option value="rmsprop">RMSprop</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Learning Rate:</label>
+                        <input type="number" id="m1-lr" value="0.001" step="0.0001">
+                    </div>
+                    <div class="form-group">
+                        <label>Batch Size:</label>
+                        <input type="number" id="m1-batch" value="512" step="32">
+                    </div>
+                    <div class="form-group">
+                        <label>Epochs:</label>
+                        <input type="number" id="m1-epochs" value="10" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Dropout Rate:</label>
+                        <input type="number" id="m1-dropout" value="0.2" step="0.1" min="0" max="0.9">
+                    </div>
+                </div>
+                
+                <button onclick="trainModel(1)">Train Model 1</button>
+                <div id="status-1" class="status idle">Status: Idle</div>
+            </div>
+            
+            <!-- Model 2 Configuration -->
+            <div class="model-config">
+                <h2>Model-2 Configuration</h2>
+                <div class="config-section">
+                    <h3>Model Type:</h3>
+                    <select id="m2-model-type" onchange="toggleChannelInputs(2)">
+                        <option value="fnn">Feed Forward Neural Network</option>
+                        <option value="cnn">Convolutional Neural Network</option>
+                    </select>
+                </div>
+                
+                <div class="config-section" id="m2-fnn-config" style="display: none;">
+                    <h3>Hidden Neurons (FFNN only)</h3>
+                    <div class="form-group">
+                        <label>Layer 1:</label>
+                        <input type="number" id="m2-neuron1" value="512" min="32" max="1024" step="32">
+                    </div>
+                    <div class="form-group">
+                        <label>Layer 2:</label>
+                        <input type="number" id="m2-neuron2" value="256" min="32" max="512" step="32">
+                    </div>
+                    <div class="form-group">
+                        <label>Layer 3:</label>
+                        <input type="number" id="m2-neuron3" value="128" min="32" max="256" step="32">
+                    </div>
+                </div>
+                
+                <div class="config-section" id="m2-cnn-config" style="display: none;">
+                    <h3>Channel Sizes (CNN only)</h3>
+                    <div class="form-group">
+                        <label>Conv Layer 1:</label>
+                        <input type="number" id="m2-channel1" value="16" min="8" max="64" step="8">
+                    </div>
+                    <div class="form-group">
+                        <label>Conv Layer 2:</label>
+                        <input type="number" id="m2-channel2" value="32" min="16" max="128" step="16">
+                    </div>
+                    <div class="form-group">
+                        <label>Conv Layer 3:</label>
+                        <input type="number" id="m2-channel3" value="64" min="32" max="256" step="32">
+                    </div>
+                </div>
+                
+                <div class="config-section">
+                    <h3>Training Parameters</h3>
+                    <div class="form-group">
+                        <label>Optimizer:</label>
+                        <select id="m2-optimizer">
+                            <option value="sgd">SGD</option>
+                            <option value="momentum">Momentum</option>
+                            <option value="nag">NAG</option>
+                            <option value="adam" selected>Adam</option>
+                            <option value="adagrad">AdaGrad</option>
+                            <option value="rmsprop">RMSprop</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Learning Rate:</label>
+                        <input type="number" id="m2-lr" value="0.001" step="0.0001">
+                    </div>
+                    <div class="form-group">
+                        <label>Batch Size:</label>
+                        <input type="number" id="m2-batch" value="512" step="32">
+                    </div>
+                    <div class="form-group">
+                        <label>Epochs:</label>
+                        <input type="number" id="m2-epochs" value="10" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Dropout Rate:</label>
+                        <input type="number" id="m2-dropout" value="0.2" step="0.1" min="0" max="0.9">
+                    </div>
+                </div>
+                
+                <button onclick="trainModel(2)">Train Model 2</button>
+                <div id="status-2" class="status idle">Status: Idle</div>
+            </div>
+        </div>
+        
+        <div class="summary-section">
+            <h2>Model Summaries</h2>
+            <div class="model-configs">
+                <div class="model-config">
+                    <h3>Model 1 Summary</h3>
+                    <div id="summary-1" class="model-summary">No summary available</div>
+                </div>
+                <div class="model-config">
+                    <h3>Model 2 Summary</h3>
+                    <div id="summary-2" class="model-summary">No summary available</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Comparison Table -->
+        <h2>Model Comparison</h2>
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Model 1</th>
+                    <th>Model 2</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Training Time</td>
+                    <td id="time-1">-</td>
+                    <td id="time-2">-</td>
+                </tr>
+                <tr>
+                    <td>Final Training Accuracy</td>
+                    <td id="train-acc-1">-</td>
+                    <td id="train-acc-2">-</td>
+                </tr>
+                <tr>
+                    <td>Final Validation Accuracy</td>
+                    <td id="val-acc-1">-</td>
+                    <td id="val-acc-2">-</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <!-- Training Curves -->
+        <div class="plots">
+            <div class="plot" id="accuracyPlot"></div>
+            <div class="plot" id="lossPlot"></div>
+        </div>
+    </div>
+
+    <script>
+        let model1Data = {
+            accuracies: [],
+            losses: [],
+            iterations: []
+        };
+        let model2Data = {
+            accuracies: [],
+            losses: [],
+            iterations: []
+        };
+
+        function toggleChannelInputs(modelNum) {
+            const modelType = document.getElementById(`m${modelNum}-model-type`).value;
+            const fnnConfig = document.getElementById(`m${modelNum}-fnn-config`);
+            const cnnConfig = document.getElementById(`m${modelNum}-cnn-config`);
+            
+            if (modelType === 'cnn') {
+                fnnConfig.style.display = 'none';
+                cnnConfig.style.display = 'block';
+            } else {
+                fnnConfig.style.display = 'block';
+                cnnConfig.style.display = 'none';
+            }
+        }
+
+        function getModelConfig(modelNum) {
+            const modelType = document.getElementById(`m${modelNum}-model-type`).value;
+            const config = {
+                model_type: modelType,
+                optimizer: document.getElementById(`m${modelNum}-optimizer`).value,
+                learning_rate: parseFloat(document.getElementById(`m${modelNum}-lr`).value),
+                batch_size: parseInt(document.getElementById(`m${modelNum}-batch`).value),
+                epochs: parseInt(document.getElementById(`m${modelNum}-epochs`).value),
+                dropout: parseFloat(document.getElementById(`m${modelNum}-dropout`).value)
+            };
+            
+            if (modelType === 'fnn') {
+                config.channels = [
+                    parseInt(document.getElementById(`m${modelNum}-neuron1`).value),
+                    parseInt(document.getElementById(`m${modelNum}-neuron2`).value),
+                    parseInt(document.getElementById(`m${modelNum}-neuron3`).value)
+                ];
+            } else {
+                config.channels = [
+                    parseInt(document.getElementById(`m${modelNum}-channel1`).value),
+                    parseInt(document.getElementById(`m${modelNum}-channel2`).value),
+                    parseInt(document.getElementById(`m${modelNum}-channel3`).value)
+                ];
+            }
+            
+            return config;
+        }
+
+        function trainModel(modelNum) {
+            const config = getModelConfig(modelNum);
+            const statusElement = document.getElementById(`status-${modelNum}`);
+            statusElement.className = 'status training';
+            statusElement.textContent = 'Status: Training...';
+
+            fetch('/train', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    model_num: modelNum,
+                    config: config
+                })
+            });
+        }
+
+        function updatePlots() {
+            fetch('/get_data')
+                .then(response => response.json())
+                .then(data => {
+                    // Update model data
+                    if (data.model1) {
+                        model1Data = data.model1;
+                        updateStatus(1, data.model1.status, data.model1);
+                        updateMetrics(1, data.model1.metrics);
+                    }
+                    if (data.model2) {
+                        model2Data = data.model2;
+                        updateStatus(2, data.model2.status, data.model2);
+                        updateMetrics(2, data.model2.metrics);
+                    }
+
+                    // Plot accuracy curves
+                    const accuracyTraces = [
+                        {
+                            y: model1Data.accuracies,
+                            x: model1Data.iterations,
+                            name: 'Model 1 Accuracy',
+                            type: 'scatter',
+                            mode: 'lines+markers'
+                        },
+                        {
+                            y: model2Data.accuracies,
+                            x: model2Data.iterations,
+                            name: 'Model 2 Accuracy',
+                            type: 'scatter',
+                            mode: 'lines+markers'
+                        }
+                    ];
+
+                    // Plot loss curves
+                    const lossTraces = [
+                        {
+                            y: model1Data.losses,
+                            x: model1Data.iterations,
+                            name: 'Model 1 Loss',
+                            type: 'scatter',
+                            mode: 'lines+markers'
+                        },
+                        {
+                            y: model2Data.losses,
+                            x: model2Data.iterations,
+                            name: 'Model 2 Loss',
+                            type: 'scatter',
+                            mode: 'lines+markers'
+                        }
+                    ];
+
+                    Plotly.react('accuracyPlot', accuracyTraces, {
+                        title: 'Training Accuracy Comparison',
+                        xaxis: { title: 'Epochs' },
+                        yaxis: { title: 'Accuracy (%)', range: [0, 100] }
+                    });
+
+                    Plotly.react('lossPlot', lossTraces, {
+                        title: 'Training Loss Comparison',
+                        xaxis: { title: 'Epochs' },
+                        yaxis: { title: 'Loss' }
+                    });
+                });
+        }
+
+        function updateStatus(modelNum, status, data) {
+            const statusElement = document.getElementById(`status-${modelNum}`);
+            statusElement.className = `status ${status.toLowerCase()}`;
+            statusElement.textContent = `Status: ${status}`;
+
+            // Update model summary if available
+            if (data.model_summary) {
+                const summaryElement = document.getElementById(`summary-${modelNum}`);
+                summaryElement.textContent = data.model_summary;
+            }
+        }
+
+        function updateMetrics(modelNum, metrics) {
+            if (metrics) {
+                document.getElementById(`time-${modelNum}`).textContent = metrics.training_time;
+                document.getElementById(`train-acc-${modelNum}`).textContent = metrics.final_train_acc;
+                document.getElementById(`val-acc-${modelNum}`).textContent = metrics.final_val_acc;
+            }
+        }
+
+        // Update plots every 500ms
+        setInterval(updatePlots, 500);
+
+        // Call toggleChannelInputs on page load to set initial state
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleChannelInputs(1);
+            toggleChannelInputs(2);
+        });
+    </script>
+</body>
+</html> 
