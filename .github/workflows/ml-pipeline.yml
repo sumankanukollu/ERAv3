@@ -23,15 +23,15 @@ jobs:
         
     - name: Train model
       run: |
-        python train.py
+        python Session-5/train.py
         
     - name: Run tests
       run: |
-        pytest test_model.py -v
+        pytest Session-5/test_model.py -v
 
     - name: Archive model artifacts
       uses: actions/upload-artifact@v4
       with:
         name: model-artifacts
-        path: model_mnist_*.pth
+        path: Session-5/model_mnist_*.pth
         retention-days: 90
