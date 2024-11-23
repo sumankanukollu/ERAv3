@@ -53,11 +53,11 @@ def train():
     
     # Load MNIST dataset with augmentation
     train_transform = transforms.Compose([
-        transforms.RandomRotation(15),  # Random rotation up to 15 degrees
-        transforms.RandomAffine(0, translate=(0.1, 0.1)),  # Random shift up to 10%
+        # transforms.RandomRotation(15),  # Random rotation up to 15 degrees
+        # transforms.RandomAffine(0, translate=(0.1, 0.1)),  # Random shift up to 10%
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,)),
-        transforms.RandomErasing(p=0.2)  # Randomly erase parts of image
+        # transforms.RandomErasing(p=0.2)  # Randomly erase parts of image
     ])
     
     test_transform = transforms.Compose([
@@ -69,12 +69,12 @@ def train():
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=128, shuffle=True)
     
     # Save augmented samples
-    print("Saving augmented samples...")
-    save_augmented_samples(train_dataset, num_images=100)
-    print("Augmented samples saved in 'augmented_samples' directory")
+    print("### Saving augmented samples...")
+    save_augmented_samples(train_dataset, num_images=10)
+    print("### Augmented samples saved in 'augmented_samples' directory")
     
     # Display model summary
-    print("\nModel Summary:")
+    print("\n### Model Summary:")
     summary(model, (1, 28, 28))
 
     criterion = nn.CrossEntropyLoss()
@@ -90,7 +90,9 @@ def train():
                 desc='Training',
                 ncols=100,
                 bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]',
-                file=sys.stdout)
+                dynamic_ncols=False,  # Disable dynamic width updates
+                file=sys.stdout        # Ensure output goes to stdout for Actions log
+            )
     
     for data, target in pbar:
         data, target = data.to(device), target.to(device)
@@ -107,13 +109,13 @@ def train():
         acc = 100. * correct / total
         
         # Update progress bar less frequently (every 50 batches)
-        if total % (50 * target.size(0)) == 0:
-            pbar.set_postfix({
-                'loss': f'{loss.item():.4f}', 
-                'accuracy': f'{acc:.2f}%'
-            }, refresh=True)
-    
-    print(f'\nFinal Training Accuracy: {acc:.2f}%')
+        # if total % (50 * target.size(0)) == 0:
+        pbar.set_postfix({
+            'loss': f'{loss.item():.4f}', 
+            'accuracy': f'{acc:.2f}%'
+        }, refresh=True)
+        
+    print(f'\n### Final Training Accuracy: {acc:.2f}%')
     
     # Save model with timestamp and accuracy
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')

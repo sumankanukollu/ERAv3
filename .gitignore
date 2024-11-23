@@ -25,3 +25,7 @@ data/
 
 # Logs
 *.log 
+
+# Files:
+augmented_samples/
+model_mnist_*.pth

@@ -27,7 +27,7 @@ jobs:
         
     - name: Run tests
       run: |
-        pytest  Session-5/test_model.py -v
+        pytest  Session-5/test_model.py -v --capture=no
 
     - name: Debug file structure
       run: |

@@ -75,7 +75,8 @@ def test_model_accuracy():
             total += target.size(0)
     
     accuracy = 100. * correct / total
-    print(f"Accuracy of the model is : {accuracy}")
+    # import pdb;pdb.set_trace()
+    print(f"### Accuracy of the model is : {accuracy}")
     assert accuracy > 90, f"Model accuracy is {accuracy:.2f}%, should be > 90%"
 
 def test_model_gradient_flow():
