@@ -3,7 +3,7 @@ name: ML Pipeline
 on: [push]
 
 jobs:
-  build-and-test:
+  Session-5-MNIST-MLOPS-pipeline:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,15 +23,27 @@ jobs:
         
     - name: Train model
       run: |
-        python Session-5/train.py
+        python -u Session-5/train.py 2>&1 | grep -v "Training:"  # Filter out intermediate progress bars
         
     - name: Run tests
       run: |
-        pytest Session-5/test_model.py -v
+        pytest  Session-5/test_model.py -v
 
-    - name: Archive model artifacts
+    - name: Debug file structure
+      run: |
+        pwd
+        ls -la
+        echo "Looking for model files:"
+        find . -name "model_mnist_*.pth"
+        echo "Looking for augmented samples:"
+        find . -name "*.png"
+
+    - name: Archive model and augmented samples
       uses: actions/upload-artifact@v4
       with:
-        name: model-artifacts
-        path: Session-5/model_mnist_*.pth
+        name: training-artifacts
+        path: |
+          ./model_mnist_*.pth
+          ./augmented_samples/*.png
         retention-days: 90
+        if-no-files-found: error
