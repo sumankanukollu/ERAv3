@@ -6,26 +6,100 @@ This project implements a Convolutional Neural Network (CNN) for MNIST digit cla
 
 ## Project Structure 
 ```
-├── model.py # Neural network architecture definitions
-├── train.py # Training script with data augmentation
-├── test_model.py # Test suite for model validation
-├── requirements.txt # Project dependencies
-├── .gitignore # Git ignore rules
+ERAV3
+├── README.md
+├── Session-1
+├── Session-2
+├── Session-3
+├── Session-4
+├── Session-5
 └── .github/
-└── workflows/
-└── ml-pipeline.yml # CI/CD pipeline configuration
+    └── workflows/
+        └── ml-pipeline.yml # CI/CD pipeline configuration
+
+
+Session-5
+    ├── requirements.txt # Project dependencies
+    ├── model.py # Neural network architecture definitions
+    ├── train.py # Training script with data augmentation
+    ├── test_model.py # Test suite for model validation
+    ├── augmented_samples
+        ├── augmented_samples_grid.png
+    ├── README.md
+    ├── .gitignore # Git ignore rules
+
 ```
 
 
 ## Model Architecture
 
-The project includes two model architectures:
-1. `MNISTModel`: A basic CNN with ~25k parameters
+The project includes two or more model architectures:
+1. `MNISTModel`: A basic CNN model with ~52k parameters
+    ```
+    ### Model Summary:
+    ----------------------------------------------------------------
+            Layer (type)               Output Shape         Param #
+    ================================================================
+                Conv2d-1            [-1, 8, 28, 28]              80
+                Conv2d-2           [-1, 16, 14, 14]           1,168
+                Linear-3                   [-1, 64]          50,240
+                Linear-4                   [-1, 10]             650
+    ================================================================
+    Total params: 52,138
+    Trainable params: 52,138
+    Non-trainable params: 0
+    ----------------------------------------------------------------
+    Input size (MB): 0.00
+    Forward/backward pass size (MB): 0.07
+    Params size (MB): 0.20
+    Estimated Total Size (MB): 0.27
+    ----------------------------------------------------------------
+    ```
+
 2. `MNISTModel_2`: An optimized CNN with:
    - Multiple convolutional layers
    - Batch normalization
    - No bias in most layers
    - Receptive field calculation comments
+   ```
+    ### Model Summary:
+    ----------------------------------------------------------------
+            Layer (type)               Output Shape         Param #
+    ================================================================
+                Conv2d-1            [-1, 8, 26, 26]              72
+                ReLU-2            [-1, 8, 26, 26]               0
+        BatchNorm2d-3            [-1, 8, 26, 26]              16
+                Conv2d-4           [-1, 16, 24, 24]           1,152
+                ReLU-5           [-1, 16, 24, 24]               0
+        BatchNorm2d-6           [-1, 16, 24, 24]              32
+            MaxPool2d-7           [-1, 16, 12, 12]               0
+                Conv2d-8           [-1, 16, 10, 10]           2,304
+                ReLU-9           [-1, 16, 10, 10]               0
+        BatchNorm2d-10           [-1, 16, 10, 10]              32
+            Conv2d-11             [-1, 16, 8, 8]           2,304
+                ReLU-12             [-1, 16, 8, 8]               0
+        BatchNorm2d-13             [-1, 16, 8, 8]              32
+            Conv2d-14             [-1, 16, 6, 6]           2,320
+                ReLU-15             [-1, 16, 6, 6]               0
+        BatchNorm2d-16             [-1, 16, 6, 6]              32
+            Conv2d-17             [-1, 16, 4, 4]           2,304
+                ReLU-18             [-1, 16, 4, 4]               0
+        BatchNorm2d-19             [-1, 16, 4, 4]              32
+            Conv2d-20             [-1, 10, 4, 4]             160
+                ReLU-21             [-1, 10, 4, 4]               0
+        BatchNorm2d-22             [-1, 10, 4, 4]              20
+            Conv2d-23             [-1, 10, 1, 1]           1,600
+    ================================================================
+    Total params: 12,412
+    Trainable params: 12,412
+    Non-trainable params: 0
+    ----------------------------------------------------------------
+    Input size (MB): 0.00
+    Forward/backward pass size (MB): 0.44
+    Params size (MB): 0.05
+    Estimated Total Size (MB): 0.49
+    ----------------------------------------------------------------
+    ```
 
 ## Features
 
@@ -73,7 +147,7 @@ The GitHub Actions workflow:
     ```python train.py```
 
 4. Run Tests:
-    ```pytest test_model.py -v```
+    ```pytest test_model.py -v --capture=no```
 
 
 ### GitHub Integration
@@ -89,7 +163,7 @@ The GitHub Actions workflow:
 
 The pipeline generates and stores:
 - Trained model weights (`model_mnist_[timestamp]_acc[accuracy].pth`)
-- 100 augmented sample images
+- 30 augmented sample images
 - Test results
 
 ## Requirements

@@ -27,5 +27,4 @@ data/
 *.log 
 
 # Files:
-augmented_samples/
-model_mnist_*.pth
+quiz_submission/
