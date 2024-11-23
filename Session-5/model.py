@@ -5,8 +5,8 @@ import torch.nn.functional as F
 class MNISTModel(nn.Module):
     def __init__(self):
         super(MNISTModel, self).__init__()
-        self.conv1 = nn.Conv2d(1, 8, kernel_size=3, padding=0)
-        self.conv2 = nn.Conv2d(8, 16, kernel_size=3, padding=0)
+        self.conv1 = nn.Conv2d(1, 8, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(8, 16, kernel_size=3, padding=1)
         self.fc1 = nn.Linear(16 * 7 * 7, 64)
         self.fc2 = nn.Linear(64, 10)
         
@@ -77,3 +77,6 @@ class MNISTModel_2(nn.Module):
 
         x = x.view(-1, 10)
         return F.log_softmax(x, dim=-1)
+
+# Create a global model instance
+selected_model = MNISTModel_2()
