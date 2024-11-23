@@ -1,3 +1,5 @@
+[![ML Pipeline](https://github.com/sumankanukollu/ERAv3/actions/workflows/ml-pipeline.yml/badge.svg)](https://github.com/sumankanukollu/ERAv3/actions/workflows/ml-pipeline.yml)
+
 # MNIST Classification with CI/CD Pipeline
 
 This project implements a Convolutional Neural Network (CNN) for MNIST digit classification with a complete CI/CD pipeline using GitHub Actions. The model achieves >95% accuracy in just one epoch while maintaining a small parameter count < 25K.
