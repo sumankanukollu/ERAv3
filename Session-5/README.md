@@ -2,7 +2,11 @@
 
 # MNIST Classification with CI/CD Pipeline
 
-This project implements a Convolutional Neural Network (CNN) for MNIST digit classification with a complete CI/CD pipeline using GitHub Actions. The model achieves >95% accuracy in just one epoch while maintaining a small parameter count < 25K.
+## Goal:
+Make a MNIST based model that has following characteristics:
+- Has less than 25000 parameters
+- Gets to training accuracy of 95% or more in 1 Epoch
+- with a complete CI/CD pipeline using GitHub Actions
 
 ## Project Structure 
 ```
@@ -24,7 +28,7 @@ Session-5
     ├── train.py # Training script with data augmentation
     ├── test_model.py # Test suite for model validation
     ├── augmented_samples
-        ├── augmented_samples_grid.png
+        ├── rotated_mnist_examples.png
     ├── README.md
     ├── .gitignore # Git ignore rules
 
@@ -33,8 +37,12 @@ Session-5
 
 ## Model Architecture
 
-The project includes two or more model architectures:
-1. `MNISTModel`: A basic CNN model with ~52k parameters
+- In `model.py` file we can select the model using a variable, for example `selected_model = MNISTModel_2()`
+
+
+    ### 1. MNISTModel_1: 
+    A basic CNN model with Linear layers 
+    - `52k parameters >> Train Accuracy in 1-epoch=94.66% lr=0.01`
     ```
     ### Model Summary:
     ----------------------------------------------------------------
@@ -55,12 +63,13 @@ The project includes two or more model architectures:
     Estimated Total Size (MB): 0.27
     ----------------------------------------------------------------
     ```
-
-2. `MNISTModel_2`: An optimized CNN with:
-   - Multiple convolutional layers
-   - Batch normalization
-   - No bias in most layers
-   - Receptive field calculation comments
+    ### 2. MNISTModel_2: 
+    An optimized CNN model without Linear layer: 
+    - In this model I removed the Linear FC layer, as number of parameters in last layer is increased & focused on the receptive field values.
+        - Multiple convolutional layers
+        - Batch normalization
+        - No bias in most layers
+    -  `12K Parameters >> Train Accuracy in 1-epoch=95.5% LR=0.1`
    ```
     ### Model Summary:
     ----------------------------------------------------------------
@@ -105,17 +114,47 @@ The project includes two or more model architectures:
 
 ### Data Augmentation
 The training pipeline includes several augmentation techniques:
-- Random rotation (±15 degrees)
-- Random affine translations (10%)
-- Random erasing (20% probability)
+- Random rotation (5 to 7 degrees)
 - Normalization
+<!-- - Random affine translations (10%) -->
+<!-- - Random erasing (20% probability) -->
 
-### Automated Testing
-The test suite (`test_model.py`) verifies:
-- Model parameter count (< 25,000)
-- Input shape compatibility (28x28)
-- Output shape verification (10 classes)
-- Model accuracy (>90% requirement)
+### Unit Testcase:
+Run 5-unit tests : `pytest -v test_model.py --capture=no`
+    
+- **Test-case-1:** To test model architecture with respect to parameter count
+    - Input shape compatibility (28x28)
+    - Model parameter count should be < 25,000
+    - Verify model is able to predict only the 10-classes (output shape verification)
+
+- **Test-case-2:** To test model Accuracy
+    - Model accuracy should be >95% in 1-epoch
+    - Identify `miss-classified` images and save them in `misclassified_grid.png`
+
+- **Test-case-3:** To test model Gradient-flow
+    - Load `test_loader` in a batch of `4` and pass the test-input to the model
+    - calculate loss and its gradients, and its gradients (mean,std,min and max)
+        - Verify that Gradients for each layer are,
+            - not contains `NaN values`
+            - Gradients are not vanished (mean not all zeros)
+
+- **Test-case-4:** To test model inference with different batch sizes [1, 16, 32, 64, 128]
+
+- **Test-case-5:** Test the robustness of a deep learning model under different input perturbations
+    - Load the trained model and set to eval mode.
+    - Apply transformations to test data
+        - Make an inference on the `original image` to generate prediction
+        - Apply a list of three `perturbations` is applied to the input image :
+            - Gaussian noise: Add random noise scaled by 0.1.
+            - Brightness adjustment: Increase brightness by multiplying the image by 1.2.
+            - Contrast adjustment: Decrease contrast by multiplying the image by 0.8.
+            -  predicted class for the perturbed image is compared to the original prediction.
+    - This scenario is to tests the model's ability to maintain consistent predictions when subjected to slight input modifications, which is crucial for evaluating the model's robustness and generalization capability
+
+
+
+
+    
 
 ### CI/CD Pipeline
 The GitHub Actions workflow:
@@ -163,7 +202,7 @@ The GitHub Actions workflow:
 
 The pipeline generates and stores:
 - Trained model weights (`model_mnist_[timestamp]_acc[accuracy].pth`)
-- 30 augmented sample images
+- 20 augmented sample images
 - Test results
 
 ## Requirements
@@ -177,9 +216,9 @@ The pipeline generates and stores:
 
 ## Model Performance
 
-- Parameters: <25,000
+- Parameters: <15,000
 - Training time: ~5 minutes on CPU
-- Accuracy: >90% after one epoch
+- Accuracy: >95% after one epoch
 - Input size: 28x28 grayscale images
 - Output: 10 classes (digits 0-9)
 

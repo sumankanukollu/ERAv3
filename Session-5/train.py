@@ -1,3 +1,4 @@
+from matplotlib import pyplot as plt
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -12,6 +13,7 @@ import numpy as np
 import random
 import sys
 
+
 def set_seed(seed=42):
     """Set all seeds for reproducibility"""
     torch.manual_seed(seed)
@@ -21,25 +23,22 @@ def set_seed(seed=42):
     np.random.seed(seed)
     random.seed(seed)
 
-def save_augmented_samples(dataset, num_images=100, save_dir='augmented_samples'):
-    # Create directory if it doesn't exist
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
+# Visualize and save randomly rotated MNIST images
+def save_rotated_mnist_plot(dataset, num_images=20, filename='rotated_mnist_plot.png',grid_size=(10, 10)):
+    # plt.figure(figsize=(10, 2))
+    num_images = min(num_images, grid_size[0] * grid_size[1])
+    plt.figure(figsize=(grid_size[1] * 1.5, grid_size[0] * 1.5))  # Adjust figure size based on grid size
     
-    # Get a dataloader with batch size 1
-    loader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True)
-    
-    # Save specified number of images
-    for i, (img, label) in enumerate(loader):
-        if i >= num_images:
-            break
-        
-        # Save the image
-        vutils.save_image(
-            img,
-            os.path.join(save_dir, f'augmented_sample_{i}_label_{label.item()}.png'),
-            normalize=True
-        )
+    for i in range(num_images):
+        image, label = dataset[i]  # Get image and label
+        plt.subplot(1, num_images, i + 1)
+        plt.imshow(image.squeeze(), cmap='gray')  # Remove the channel dimension
+        plt.title(f"Label: {label}")
+        plt.axis('off')
+    plt.tight_layout()
+    plt.savefig(filename)  # Save the plot to a file
+    print(f"Plot saved to {filename}")
+
 
 def train():
     # Set seed for reproducibility
@@ -53,11 +52,12 @@ def train():
     
     # Load MNIST dataset with augmentation
     train_transform = transforms.Compose([
-        # transforms.RandomRotation(15),  # Random rotation up to 15 degrees
         # transforms.RandomAffine(0, translate=(0.1, 0.1)),  # Random shift up to 10%
+        # transforms.RandomErasing(p=0.2),  # Randomly erase parts of image
+        # transforms.CenterCrop(0.4),
+        transforms.RandomRotation(degrees=(5, 7)),  # Random rotation up to 5 to 7 degrees
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,)),
-        # transforms.RandomErasing(p=0.2)  # Randomly erase parts of image
     ])
     
     test_transform = transforms.Compose([
@@ -70,15 +70,17 @@ def train():
     
     # Save augmented samples
     print("### Saving augmented samples...")
-    save_augmented_samples(train_dataset, num_images=10)
+    # Save plot of 5 randomly rotated MNIST images
+    save_rotated_mnist_plot(train_dataset, filename='augmented_samples/rotated_mnist_examples.png')
     print("### Augmented samples saved in 'augmented_samples' directory")
+    
     
     # Display model summary
     print("\n### Model Summary:")
     summary(model, (1, 28, 28))
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = optim.Adam(model.parameters(), lr=0.01)
     
     # Train for 1 epoch
     model.train()

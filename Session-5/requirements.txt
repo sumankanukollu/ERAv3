@@ -3,3 +3,4 @@ torchvision --index-url https://download.pytorch.org/whl/cpu
 pytest
 tqdm
 torchsummary
+matplotlib
