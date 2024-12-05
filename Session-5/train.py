@@ -14,6 +14,7 @@ import random
 import sys
 
 
+
 def set_seed(seed=42):
     """Set all seeds for reproducibility"""
     torch.manual_seed(seed)
@@ -71,8 +72,8 @@ def train():
     # Save augmented samples
     print("### Saving augmented samples...")
     # Save plot of 5 randomly rotated MNIST images
-    save_rotated_mnist_plot(train_dataset, filename='augmented_samples/rotated_mnist_examples.png')
-    print("### Augmented samples saved in 'augmented_samples' directory")
+    save_rotated_mnist_plot(train_dataset, filename=os.path.join(os.getcwd(),'Session-5','rotated_mnist_examples.png'))
+    print("### Augmented samples saved")
     
     
     # Display model summary
